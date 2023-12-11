@@ -3,7 +3,11 @@ package frc.robot;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.SnailSubsystem;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.arm.ArmIOSparkMax;
 import frc.robot.util.SnailController;
 
 import java.util.ArrayList;
@@ -23,7 +27,8 @@ public class RobotContainer {
     private SnailController driveController;
     private SnailController operatorController;
     
-    private ArrayList<SnailSubsystem> subsystems;
+    private ArrayList<SubsystemBase> subsystems;
+    private Arm arm;
 
     private Notifier updateNotifier;
     private int outputCounter;
@@ -34,6 +39,8 @@ public class RobotContainer {
     public RobotContainer() {
         driveController = new SnailController(CONTROLLER_DRIVER_ID);
         operatorController = new SnailController(CONTROLLER_OPERATOR_ID);
+        Arm arm = new Arm(new ArmIOSparkMax());
+
 
         configureSubsystems();
         configureAutoChoosers();
@@ -61,7 +68,11 @@ public class RobotContainer {
      * Define button -> command mappings.
      */
     private void configureButtonBindings() {
-        
+        arm.setDefaultCommand(
+        new RunCommand(
+            () -> arm.move(operatorController.getLeftX()), 
+            arm)
+        );
     }
 
     /**
@@ -85,28 +96,10 @@ public class RobotContainer {
      * b) prevent packet delay from driver station from delaying response from our robot
      */
     private void update() {
-        for(SnailSubsystem subsystem : subsystems) {
-            subsystem.update();
-        }
     }
 
-    public void displayShuffleboard() {
-        if(outputCounter % 3 == 0) {
-            subsystems.get(outputCounter / 3).displayShuffleboard();
-        }
-
-        outputCounter = (outputCounter + 1) % (subsystems.size() * 3);
-    }
-
-    public void tuningInit() {
-        for(SnailSubsystem subsystem : subsystems) {
-            subsystem.tuningInit();
-        }
-    }
-
-    public void tuningPeriodic() {
-        if(outputCounter % 3 == 0) {
-            subsystems.get(outputCounter / 3).tuningPeriodic();
-        }
+    public Command getAutonomousCommand() {
+        return new InstantCommand();
+        // return autoChooser.get();
     }
 }

@@ -12,9 +12,26 @@ package frc.robot;
  */
 public final class Constants {
 
+    public static final Mode currentMode = Mode.SIM;
+
+  public static enum Mode {
+    /** Running on a real robot. */
+    REAL,
+
+    /** Running a physics simulator. */
+    SIM,
+
+    /** Replaying from a log file. */
+    REPLAY
+  }
+
     public static class ElectricalLayout {
         public final static int CONTROLLER_DRIVER_ID = 0;
         public final static int CONTROLLER_OPERATOR_ID = 1;
+    }
+
+    public static class ArmConstants {
+        public static final double ARM_PID_TOLERANCE = 0.0;
     }
 
     public static class Autonomous {
